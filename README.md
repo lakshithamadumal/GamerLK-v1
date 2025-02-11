@@ -64,6 +64,14 @@ Use these credentials to access the **Admin Panel**.
 
 ## 📸 Screenshots
 ![Gamerlk](./screenshot/1.png)
+![Gamerlk](./screenshot/2.png)
+![Gamerlk](./screenshot/3.png)
+![Gamerlk](./screenshot/4.png)
+![Gamerlk](./screenshot/5.png)
+![Gamerlk](./screenshot/6.png)
+![Gamerlk](./screenshot/7.png)
+![Gamerlk](./screenshot/8.png)
+![Gamerlk](./screenshot/9.png)
 
 ---
 
