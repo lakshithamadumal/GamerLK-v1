@@ -1,0 +1,399 @@
+<?php
+require "connection.php";
+
+if (isset($_GET["id"])) {
+
+    $pid = $_GET["id"];
+
+    $product_rs = Database::search("SELECT product.id,product.price,product.description,product.title,
+    product.datetime_added,product.category_cat_id,
+    product.status_status_id
+     FROM `product` WHERE product.id='" . $pid . "'");
+
+    $product_num = $product_rs->num_rows;
+    if ($product_num == 1) {
+
+        $product_data = $product_rs->fetch_assoc();
+
+        // Fetch the download count
+        $download_rs = Database::search("SELECT COUNT(*) AS download_count FROM `invoice` WHERE product_id='" . $pid . "'");
+        $download_data = $download_rs->fetch_assoc();
+        $download_count = $download_data['download_count'];
+
+?>
+
+        <!DOCTYPE html>
+        <html>
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+            <title><?php echo $product_data["title"]; ?> | gamerLk</title>
+
+            <link rel="stylesheet" href="bootstrap.css" />
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+            <link rel="stylesheet" href="style.css" />
+
+            <link rel="icon" href="resourses/logo.png">
+        </head>
+
+        <body>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <?php include "header_sing.php"; ?>
+
+                    <div class="col-12 mt-0 singleProduct" style="background-color: #252526;">
+                        <div class="row">
+                            <div class="col-12" style="padding: 10px;">
+                                <div class="row">
+
+                                    <div class="col-12 col-lg-6 order-2 order-lg-1">
+                                        <ul>
+
+                                            <?php
+
+                                            $image_rs = Database::search("SELECT * FROM `product_img` WHERE `product_id`='" . $pid . "'");
+                                            $image_num = $image_rs->num_rows;
+                                            $img = array();
+
+                                            if ($image_num != 0) {
+
+                                                for ($x = 0; $x < $image_num; $x++) {
+                                                    $image_data = $image_rs->fetch_assoc();
+                                                    $img[$x] = $image_data["img_path"];
+                                            ?>
+                                                    <li class="d-flex flex-column justify-content-center align-items-center 
+                                 mb-1">
+                                                        <img src="<?php echo $img[$x]; ?>" class="img-thumbnail mt-1 mb-1 d-none d-lg-block" style="height: 600px;" id="productImg<?php echo $x; ?>" onclick="loadMainImg(<?php echo $x; ?>);" />
+                                                        <img src="<?php echo $img[$x]; ?>" class="img-thumbnail mt-1 mb-1 d-lg-none" style="height: 200px;" id="productImg<?php echo $x; ?>" onclick="loadMainImg(<?php echo $x; ?>);" />
+
+                                                    </li>
+                                                <?php
+                                                }
+                                            } else {
+                                                ?>
+                                                <li class="d-flex flex-column justify-content-center align-items-center 
+                                border border-1 border-secondary mb-1">
+                                                    <img src="<?php echo $img[$x]; ?>" class="img-thumbnail mt-1 mb-1" />
+                                                </li>
+                                                <li class="d-flex flex-column justify-content-center align-items-center 
+                                border border-1 border-secondary mb-1">
+                                                    <img src="<?php echo $img[$x]; ?>" class="img-thumbnail mt-1 mb-1" />
+                                                </li>
+                                                <li class="d-flex flex-column justify-content-center align-items-center 
+                                border border-1 border-secondary mb-1">
+                                                    <img src="resource/empty.svg" class="img-thumbnail mt-1 mb-1" />
+                                                </li>
+                                            <?php
+                                            }
+
+                                            ?>
+
+
+                                        </ul>
+                                    </div>
+                                    <!--
+                                    <div class="col-lg-4 order-2 order-lg-1 d-none d-lg-block">
+                                        <div class="row">
+                                            <div class="col-12 align-items-center border border-1 
+                                border-secondary">
+                                                <div class="mainImg" id="mainImg"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                        -->
+                                    <div class="col-12 col-lg-6 order-3" style="background-color:  #1e1e1e;">
+                                        <div class="row ">
+                                            <div class="col-12">
+
+                                                <div class="mt-3 row ">
+                                                    <nav aria-label="breadcrumb">
+                                                        <ol class="breadcrumb">
+                                                            <li class="breadcrumb-item fw-bold text-light"></li>
+                                                        </ol>
+                                                    </nav>
+                                                </div>
+
+                                                <div class="row ">
+                                                    <div class="col-12 my-2 mt-3">
+                                                        <span class="fs-1 fw-bold" style="color: #81e6d9;"> <?php echo $product_data["title"]; ?></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row  p-2">
+                                                    <div class="col-12 my-2">
+                                                        <span class="badge">
+                                                            <i class="bi bi-star-fill text-warning fs-5"></i>
+                                                            <i class="bi bi-star-fill text-warning fs-5"></i>
+                                                            <i class="bi bi-star-fill text-warning fs-5"></i>
+                                                            <i class="bi bi-star-fill text-warning fs-5"></i>
+                                                            <i class="bi bi-star text-warning fs-5"></i>
+
+                                                            &nbsp;&nbsp;&nbsp;
+
+                                                            <label class="fs-5 text-LIGHT fw-bold">4.5 Stars | 39 Reviews and Ratings</label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <?php
+
+                                                $price = $product_data["price"];
+                                                $adding_price = ($price / 100) * 5;
+                                                $new_price = $price + $adding_price;
+                                                $difference = $new_price - $price;
+                                                $percentage = ($difference / $price) * 100;
+
+                                                ?>
+
+                                                <div class="row  p-2">
+                                                    <div class="col-12 my-2">
+                                                        <span class="fs-4 text-light fw-bold">Rs. <?php echo $price; ?></span>
+                                                    </div>
+                                                </div>
+                                                </br>
+
+                                                <div class="row  p-2">
+                                                    <div class="col-10 my-2">
+                                                        <label class="fs-5 text-light fw-bold">Downloads</label> &nbsp;&nbsp;&nbsp;
+                                                        &nbsp;&nbsp;&nbsp;
+
+                                                        <span class="col-12 text-light">
+                                                            <?php echo $download_count; ?>
+                                                        </span>
+
+                                                    </div>
+                                                </div>
+
+                                                <br>
+
+                                                <div class="row  p-2">
+                                                    <div class="col-10 my-2">
+                                                        <label class="fs-5 text-light fw-bold">Description</label>
+                                                        </br></br>
+                                                        <div class="col-12 text-light">
+                                                            <?php echo $product_data["description"]; ?>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+
+
+
+
+
+
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="row">
+                                                            <div class="col-12 my-2">
+                                                                <div class="row g-2">
+
+
+                                                                    <div class="row">
+                                                                        <div class="col-12 mt-5 mb-sm-4">
+                                                                            <div class="row">
+                                                                                <div class="col-4 d-grid">
+                                                                                    <button class="btn btn-success fw-bold" type="submit" id="payhere-payment" onclick="paynow(<?php echo $pid ?>);">Buy Now</button>
+                                                                                </div>
+                                                                                <div class="col-4 d-grid">
+                                                                                    <button onclick="addToCart(<?php echo $product_data['id']; ?>);" class="btn btn-primary fw-bold">Add To Cart</button>
+                                                                                </div>
+                                                                                <div class="col-4 d-grid">
+                                                                                    <button onclick="addToWatchlist(<?php echo $product_data['id']; ?>);" class="btn btn-dark  fw-bold">
+                                                                                        Watchlist
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-12">
+                                <div class="row">
+
+                                    <div class="col-12">
+                                        <div class="row d-block me-0 mt-4 mb-3">
+                                            <div class="col-12 mb-2 mt-2 text-center">
+                                                <span class=" fw-bold text-light " style="font-size: 60px;">Feedbacks</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+                            <div class="col-12 col-lg-12">
+                                <div class="row rounded bg-dark1 me-0" style="height: 300px;">
+
+                                    <?php
+
+                                    $feedback_rs = Database::search("SELECT * FROM `feedback` WHERE `product_id`='" . $pid . "'");
+                                    $feedback_num = $feedback_rs->num_rows;
+
+                                    for ($x = 0; $x < $feedback_num; $x++) {
+                                        $feedback_data = $feedback_rs->fetch_assoc();
+                                    ?>
+                                        <div class="col-12 mt-1 mb-1 mx-1">
+                                            <div class="row border border-1 border-light rounded me-0">
+                                                <?php
+
+                                                $user_rs = Database::search("SELECT * FROM `users` WHERE `email`='" . $feedback_data["users_email"] . "'");
+                                                $user_data = $user_rs->fetch_assoc();
+
+                                                ?>
+                                                <div class="col-10 mt-2 mb-1 ms-0 text-light"><?php echo $user_data["fname"] . " " . $user_data["lname"]; ?></div>
+                                                <div class="col-2 mt-2 mb-1 me-0">
+                                                    <?php
+                                                    if ($feedback_data["type"] == 1) {
+                                                    ?>
+                                                        <span class="badge bg-success">Positive</span>
+                                                </div>
+                                            <?php
+                                                    } else if ($feedback_data["type"] == 2) {
+                                            ?>
+                                                <span class="badge bg-warning">Neutral</span>
+                                            </div>
+                                        <?php
+                                                    } else if ($feedback_data["type"] == 3) {
+                                        ?>
+                                            <span class="badge bg-danger">Negative</span>
+                                        </div>
+                                    <?php
+                                                    }
+                                    ?>
+
+                                    <div class="col-12">
+                                        <b class="text-warning mx-3">
+                                            <?php echo $feedback_data["feedback"]; ?>
+                                        </b>
+                                    </div>
+                                    <div class="offset-6 col-6 text-end">
+                                        <label class="form-label text-light" style="font-size: 12px;"><?php echo $feedback_data["date"]; ?></label>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php
+                                    }
+
+                        ?>
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-2">
+                        <div class="row d-block me-0 mt-4 mb-3">
+                            <div class="col-12 text-center mb-3">
+                                <span class="fw-bold text-light" style="font-size: 60px;">Featured Games</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class=" row justify-content-center gap-4">
+
+                            <?php
+
+                            $related_rs = Database::search("SELECT * FROM `product` LIMIT 4");
+                            $related_num = $related_rs->num_rows;
+
+                            for ($x = 0; $x < $related_num; $x++) {
+                                $related_data = $related_rs->fetch_assoc();
+
+                                $product_img_rs = Database::search("SELECT * FROM `product_img` WHERE 
+                                                    `product_id`='" . $related_data["id"] . "'");
+                                $product_img_data = $product_img_rs->fetch_assoc();
+                            ?>
+
+                                <div class="card col-12 col-lg-2 mt-2 mb-2 border-0 x btnn geeks" style="width: 18rem;background-color: #1e1e1e">
+                                    <a href="<?php echo "singleProductView.php?id=" . ($related_data["id"]); ?>">
+                                        <img src="<?php echo $product_img_data["img_path"]; ?>" class="card-img-top img-thumbnail1 mt-2" style="height: 250px;" />
+                                    </a>
+                                    <div class="card-body ms-0 m-0 text-start" style="background-color: #1e1e1e;">
+                                        <span style="font-size: 14px; color: #606063;"></span>
+                                        <h5 class="card-title fw-bold  text-light" style="font-size: 14px; padding-top: 7px;"><?php echo $related_data["title"]; ?></h5>
+                                        <div class="star">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="bi bi-star text-warning"></i>
+
+                                        </div>
+                                        <span class="card-text" style="padding-top: 7px; font-size: 15px; font-weight: 700; color: #81e6d9;">Rs. <?php echo $related_data["price"]; ?> </span><br />
+                                        <div class="col-12">
+                                            <div class="row offset-8">
+
+                                                <button onclick="addToWatchlist(<?php echo $product_data['id']; ?>);" class="col-3 btn mt-2 btn_c">
+                                                    <i class="fa-solid fa-heart fa-xl"></i>
+                                                </button>
+                                                <div class="col-1"></div>
+                                                <button onclick="addToCart(<?php echo $product_data['id']; ?>);" class="col-1 btn mt-2 btn_c">
+                                                    <i class="fa-solid fa-cart-shopping fa-xl"></i>
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            <?php
+                            }
+
+                            ?>
+
+                        </div>
+                    </div>
+
+
+
+
+
+
+                </div>
+            </div>
+
+
+            </div>
+            </div>
+            <?php include "footer.php"; ?>
+
+            <script src="bootstrap.bundle.js"></script>
+            <script src="script.js"></script>
+            <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
+        </body>
+
+        </html>
+
+
+<?php
+
+    } else {
+        echo ("Sory for the inconvinient");
+    }
+} else {
+    echo ("Something went wrong");
+}
+
+?>
