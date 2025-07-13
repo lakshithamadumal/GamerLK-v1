@@ -30,7 +30,7 @@ GamerLK is a fully responsive eCommerce web application for purchasing games acr
 
 1️⃣ Clone this repository:
 ```bash
-git clone https://github.com/akshithamadumal/Gamerlk.git
+git clone https://github.com/akshithamadumal/GamerLK-v1.git
 ```
 
 2️⃣ Move the project to your XAMPP `htdocs` folder:
@@ -49,7 +49,7 @@ $dbname = "gamerlk_db";
 ```
 6️⃣ Open the browser and go to:
 ```url
-http://localhost/GamerLK/
+http://localhost/GamerLK-v1/
 ```
 
 ---
